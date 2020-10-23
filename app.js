@@ -1,4 +1,4 @@
-
+const { graphqlHTTP } = require('express-graphql');
 const express = require("express");
 var logger = require('morgan');
 const config = require("config")
@@ -8,12 +8,13 @@ const cors = require("cors")
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const schema = require('./graphql/schema');
+const root = require('./graphql/root');
 
 var app = express();
 
 // view engine setup\
 app.use(cors())
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -22,6 +23,20 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 const PORT = process.env.PORT || 5000
+
+app.use("/graphql", graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true,
+}))
+
+app.use(function(err, req, res, next) {
+
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.status(err.status || 500);
+});
+
 
 async function start() {
   try {
@@ -38,13 +53,3 @@ async function start() {
 }
 
 start()
-
-// error handler
-app.use(function(err, req, res, next) {
-
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  res.status(err.status || 500);
-});
-
-module.exports = app;
