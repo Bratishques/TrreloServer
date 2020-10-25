@@ -5,9 +5,16 @@ var schema = buildSchema(`
     hello: String
     boards: [Board!]
   }
+  type Mutation {
+    createBoard(name: String!):Board
+    createThread(name: String!, boardId: ID!): Thread
+    createTag(name: String!, boardId: ID!): Tag
+    createComment(authorId: ID!, text: String!): Comment
+    replyToComment(commentId: ID!, authorId: ID!, text: String!): Comment
+  }
   type Board {
     _id: ID!
-    title: String!
+    name: String!
     color: String!
     threads: [Thread!]
     createdAt: String!
@@ -39,6 +46,10 @@ var schema = buildSchema(`
     password: String!
     boards: [Board!]
   },
+  schema {
+    query: Query
+    mutation: Mutation
+  }
 `);
 
 module.exports = schema

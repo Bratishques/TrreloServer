@@ -5,7 +5,7 @@ const schema = Schema({
     tags: [{type: Schema.Types.ObjectId, ref: 'Tag'}],
     status: String,
     comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
-    
+    attachments: []
 
 }, { timestamps: true })
 
