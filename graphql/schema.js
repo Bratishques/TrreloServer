@@ -4,18 +4,28 @@ var schema = buildSchema(`
   type Query {
     hello: String
     boards: [Board!]
+    threads
   }
   type Mutation {
     createBoard(name: String!):Board
     createThread(name: String!, boardId: ID!): Thread
+    createPost(name: String, BoardId: ID!): Post
     createTag(name: String!, boardId: ID!): Tag
-    createComment(authorId: ID!, text: String!): Comment
+    createComment(authorId: ID!, text: String!, threadId: ID!): Comment
     replyToComment(commentId: ID!, authorId: ID!, text: String!): Comment
+    applyTagToPost(PostId: ID!, tagId: ID!): Thread
+
+  }
+  type Post {
+    _id: ID!
+    name: String!
+    status: String!
+    comments: [Comment!]
+    attachments: [Attachment!]
   }
   type Board {
     _id: ID!
     name: String!
-    color: String!
     threads: [Thread!]
     createdAt: String!
   }
@@ -23,8 +33,6 @@ var schema = buildSchema(`
     _id: ID!
     name: String!
     tags: [Tag!]
-    status: String!
-    comments: [Comment!]
     createdAt: String!
   },
   type Comment {
