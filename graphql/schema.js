@@ -1,10 +1,14 @@
 var { buildSchema } = require('graphql');
+const { makeExecutableSchema } = require('graphql-tools');
+const { merge } = require('lodash');
+const { boardDef, boardResolvers } = require('./Board/board');
+const { tagDef, tagResolvers } = require('./Tag/Tag');
+const { threadDef, threadResolvers } = require('./Thread/Thread');
 
-var schema = buildSchema(`
+/*var schema = buildSchema(`
   type Query {
     hello: String
     boards: [Board!]
-    threads
   }
   type Mutation {
     createBoard(name: String!):Board
@@ -23,18 +27,6 @@ var schema = buildSchema(`
     comments: [Comment!]
     attachments: [Attachment!]
   }
-  type Board {
-    _id: ID!
-    name: String!
-    threads: [Thread!]
-    createdAt: String!
-  }
-  type Thread {
-    _id: ID!
-    name: String!
-    tags: [Tag!]
-    createdAt: String!
-  },
   type Comment {
     _id: ID!
     author: [User!]
@@ -46,7 +38,6 @@ var schema = buildSchema(`
     _id: ID!
     name: String!
     color: String!
-    createdAt: String!
   },
   type User {
     name: String!
@@ -58,6 +49,24 @@ var schema = buildSchema(`
     query: Query
     mutation: Mutation
   }
-`);
+`);*/
 
-module.exports = schema
+const query = `
+  type Query {
+    hello: String
+    boards: [Board!]
+  }
+  type Mutation {
+    createBoard(name: String!):Board
+    createThread(name: String!, boardId: ID!): Thread
+    createTag(name: String!, boardId: ID!): Tag
+  }
+`;
+
+const executableSchema = makeExecutableSchema({
+  typeDefs: [query, boardDef, threadDef, tagDef],
+  resolvers: merge(boardResolvers, threadResolvers, tagResolvers)
+
+})
+
+module.exports = executableSchema

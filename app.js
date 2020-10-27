@@ -8,7 +8,7 @@ const cors = require("cors")
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-const schema = require('./graphql/schema');
+const executableSchema = require('./graphql/schema');
 const root = require('./graphql/root');
 
 var app = express();
@@ -25,8 +25,7 @@ app.use('/users', usersRouter);
 const PORT = process.env.PORT || 5000
 
 app.use("/graphql", graphqlHTTP({
-  schema: schema,
-  rootValue: root,
+  schema: executableSchema,
   graphiql: true,
 }))
 

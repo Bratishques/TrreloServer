@@ -1,4 +1,5 @@
 const Board = require("../models/Board");
+const Post = require("../models/Post");
 const Tag = require("../models/Tag");
 const Thread = require("../models/Thread");
 const User = require("../models/User");
@@ -39,6 +40,14 @@ var root = {
     board.threads.push(thread);
     await board.save();
     return { ...thread.toJSON(), _id: thread.id };
+  },
+  createPost: async ({name: name, threadId: threadId}) => {
+    const post = new Post({
+      name: name,
+      comments: [],
+      status: "Open",
+      attachments: []
+    })
   },
   createTag: async ({ name: name, boardId: boardId }) => {
     try {
