@@ -5,14 +5,14 @@ const boardDef = `
         _id: ID!
         name: String!
         threads: [Thread!]
-        createdAt: String!
+        tags: [Tag!]
     }
     `;
 const boardResolvers = {
    Query: {
     boards: async () => {
         try {
-          const Boards = await Board.find().populate("threads", "tags");
+          const Boards = await Board.find().populate("threads").populate('tags');
           return Boards;
         } catch (e) {
           console.log(e);
@@ -23,15 +23,15 @@ const boardResolvers = {
       },
     },
       Mutation: {
-      createBoard: async ({ name: name }) => {
+      async createBoard(_,{name}) {
         try {
           const board = new Board({
-            name,
+            name: name,
             threads: [],
             tags: [],
           });
-          const newBoard = await board.save();
-          return { ...newBoard.toJSON(), _id: newBoard.id };
+          await board.save();
+          return { ...board.toJSON(), _id: board.id };
         } catch (e) {
           console.log(e);
         }

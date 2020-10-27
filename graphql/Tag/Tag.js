@@ -11,7 +11,7 @@ type Tag {
 
 const tagResolvers = {
     Mutation : {
-    createTag: async ({ name: name, boardId: boardId }) => {
+    createTag: async (_, { name: name, boardId: boardId }) => {
         try {
           const tag = new Tag({
             name: name,

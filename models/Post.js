@@ -5,6 +5,6 @@ const schema = new Schema({
     comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
     status: String,
     attachments: [{type: Schema.Types.ObjectId, ref: "Attachment"}],
-})
+}, { timestamps: true })
 
 module.exports = model("Post", schema)
