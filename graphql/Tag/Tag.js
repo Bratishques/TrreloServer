@@ -26,6 +26,14 @@ const tagResolvers = {
           console.log(e);
         }
       },
+      applyTagToThread: async ({}) => {
+        try {
+        
+        }
+        catch (e) {
+          console.log(e)
+        }
+      }
     }
 }
 
