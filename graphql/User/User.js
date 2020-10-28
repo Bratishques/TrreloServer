@@ -23,7 +23,7 @@ const userDef = `
 const UserResolvers = {
   Mutation: {
     createUser: async (_, { name, email, password }) => {
-      const candidate = await User.findOne({ email: email });
+      const candidate = await User.findOne({ email: email.toLowerCase() });
       try {
         if (candidate) {
           throw new Error("Email is already registered");
@@ -31,7 +31,7 @@ const UserResolvers = {
         const hashPass = await bcrypt.hash(password, 11);
         const user = new User({
           name: name,
-          email: email,
+          email: email.toLowerCase(),
           password: hashPass,
         });
         await user.save();
@@ -42,7 +42,7 @@ const UserResolvers = {
     },
     login: async (_, { email, password }) => {
       try {
-        const user = await User.findOne({ email: email });
+        const user = await User.findOne({ email: email.toLowerCase() });
         const isMatch = await bcrypt.compare(password, user.password);
         if (!user || !isMatch) {
           throw new Error("No email/password pair found");
@@ -53,6 +53,7 @@ const UserResolvers = {
         return { token: token, userId: user.id };
       } catch (e) {
         console.log(e);
+        return e
       }
     },
     verifyToken: async (_, { token, userId }) => {
