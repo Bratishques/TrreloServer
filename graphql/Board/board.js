@@ -7,7 +7,6 @@ const boardDef = `
         name: String!
         threads: [Thread!]
         tags: [Tag!]
-        users: [User!]
     }
     `;
 const boardResolvers = {
@@ -32,9 +31,10 @@ const boardResolvers = {
             name: name,
             threads: [],
             tags: [],
-            users: [user],
           });
           await board.save();
+          user.boards.push(board)
+          await user.save()
           return { ...board.toJSON(), _id: board.id };
         } catch (e) {
           console.log(e);

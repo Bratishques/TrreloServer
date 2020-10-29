@@ -1,6 +1,7 @@
 var { buildSchema } = require('graphql');
-const { makeExecutableSchema, attachDirectiveResolvers } = require('graphql-tools');
+const { makeExecutableSchema } = require('graphql-tools');
 const { merge } = require('lodash');
+const { PubSub } = require('apollo-server');
 const { attachmentDef, attachmentResolvers } = require('./Attachment/attachment');
 const { boardDef, boardResolvers } = require('./Board/board');
 const { commentDef, commentResolvers } = require('./Comment/comment');
@@ -8,6 +9,9 @@ const { postDef, postResolvers } = require('./Post/Post');
 const { tagDef, tagResolvers } = require('./Tag/Tag');
 const { threadDef, threadResolvers } = require('./Thread/Thread');
 const { userDef, UserResolvers } = require('./User/User');
+
+
+const pubsub = new PubSub();
 
 const query = `
   type Query {
@@ -29,10 +33,10 @@ const query = `
   }
 `;
 
-const executableSchema = makeExecutableSchema({
+const executableSchema = {
   typeDefs: [query, boardDef, threadDef, tagDef, postDef, commentDef, userDef, attachmentDef],
   resolvers: merge(boardResolvers, threadResolvers, tagResolvers, postResolvers, commentResolvers, attachmentResolvers, UserResolvers)
 
-})
+}
 
 module.exports = executableSchema

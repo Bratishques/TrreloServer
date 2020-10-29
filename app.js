@@ -1,15 +1,12 @@
-const { graphqlHTTP } = require('express-graphql');
+const { ApolloServer, gql } = require('apollo-server-express')
 const express = require("express");
 var logger = require('morgan');
 const config = require("config")
 const mongoose = require("mongoose")
 const cors = require("cors")
-
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const executableSchema = require('./graphql/schema');
-const root = require('./graphql/root');
 
 var app = express();
 
@@ -24,10 +21,17 @@ app.use('/users', usersRouter);
 
 const PORT = process.env.PORT || 5000
 
-app.use("/graphql", graphqlHTTP({
+/*app.use("/graphql", graphqlHTTP({
   schema: executableSchema,
   graphiql: true,
-}))
+}))*/
+
+const server = new ApolloServer({
+  typeDefs: executableSchema.typeDefs,
+  resolvers: executableSchema.resolvers
+});
+
+server.applyMiddleware({ app })
 
 app.use(function(err, req, res, next) {
 
@@ -44,7 +48,7 @@ async function start() {
           useNewUrlParser: true,
           useCreateIndex: true
       })
-      app.listen(PORT, () => console.log(`Server started at ${PORT}`))
+      app.listen(PORT, () => console.log(`🚀 Server ready at http://localhost:5000${server.graphqlPath}`))
   } catch (e) {
       console.log("Server error", e.message)
       process.exit(1)
