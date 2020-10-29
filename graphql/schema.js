@@ -15,7 +15,7 @@ const query = `
     boards: [Board!]
   }
   type Mutation {
-    createBoard(name: String!): Board
+    createBoard(name: String!, userId: ID!): Board
     createThread(name: String!, boardId: ID!): Thread
     createTag(name: String!, boardId: ID!): Tag
     applyTagToThread(name: String!, threadId: ID!): Tag

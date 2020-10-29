@@ -1,7 +1,6 @@
 const User = require("../../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const JwtDecode = require("jwt-decode");
 
 const userDef = `
     type User {
@@ -42,9 +41,13 @@ const UserResolvers = {
     },
     login: async (_, { email, password }) => {
       try {
-        const user = await User.findOne({ email: email.toLowerCase() });
+        const user = await User.findOne({ email: email.toLowerCase()});
+        
+        if (!user) {
+          throw new Error("No email/password pair found");
+        }
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!user || !isMatch) {
+        if (!isMatch) {
           throw new Error("No email/password pair found");
         }
         const token = jwt.sign({ userId: user.id }, "jwtsecret", {
@@ -61,7 +64,7 @@ const UserResolvers = {
         const valid = jwt.verify(token, "jwtsecret").userId;
         return { valid: valid === userId };
       } catch (e) {
-        console.log(e);
+        return {valid: false}
       }
     },
   },

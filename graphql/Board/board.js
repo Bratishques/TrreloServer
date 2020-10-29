@@ -1,4 +1,5 @@
 const Board = require("../../models/Board");
+const User = require("../../models/User");
 
 const boardDef = `
     type Board {
@@ -6,6 +7,7 @@ const boardDef = `
         name: String!
         threads: [Thread!]
         tags: [Tag!]
+        users: [User!]
     }
     `;
 const boardResolvers = {
@@ -23,12 +25,14 @@ const boardResolvers = {
       },
     },
       Mutation: {
-      async createBoard(_,{name}) {
+      async createBoard(_,{name, userId}) {
         try {
+          const user = await User.findById(userId)
           const board = new Board({
             name: name,
             threads: [],
             tags: [],
+            users: [user],
           });
           await board.save();
           return { ...board.toJSON(), _id: board.id };
