@@ -1,7 +1,7 @@
 var { buildSchema } = require('graphql');
 const { makeExecutableSchema } = require('graphql-tools');
 const { merge } = require('lodash');
-const { PubSub } = require('apollo-server');
+const { PubSub, gql } = require('apollo-server');
 const { attachmentDef, attachmentResolvers } = require('./Attachment/attachment');
 const { boardDef, boardResolvers } = require('./Board/board');
 const { commentDef, commentResolvers } = require('./Comment/comment');
@@ -11,12 +11,16 @@ const { threadDef, threadResolvers } = require('./Thread/Thread');
 const { userDef, UserResolvers } = require('./User/User');
 
 
-const pubsub = new PubSub();
+const pubsub = new PubSub(); 
 
-const query = `
+const query = gql`
   type Query {
-    hello: String
+    hello: String!
     boards: [Board!]
+    userBoards(userId: ID!): [Board!]
+  }
+  type Subscription {
+    boardAdded(userId: ID!): Board
   }
   type Mutation {
     createBoard(name: String!, userId: ID!): Board

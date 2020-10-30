@@ -24,6 +24,8 @@
     "mongoose": "^5.10.10",
     "morgan": "~1.9.1",
     "nodemon": "^2.0.6",
-    "pug": "2.0.0-beta11"
+    "pug": "2.0.0-beta11",
+    "subscriptions-transport-ws": "^0.9.18",
+    "ws": "^7.3.1"
   }
 }

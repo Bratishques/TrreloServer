@@ -20,6 +20,18 @@ const userDef = `
 `;
 
 const UserResolvers = {
+
+  Query:{
+    userBoards: async (_, {userId}) => {
+      try {
+      const user = await User.findById(userId).populate('boards')
+      return user.boards
+    }
+    catch (e) {
+      console.log(e)
+    }
+    }
+  },
   Mutation: {
     createUser: async (_, { name, email, password }) => {
       const candidate = await User.findOne({ email: email.toLowerCase() });
