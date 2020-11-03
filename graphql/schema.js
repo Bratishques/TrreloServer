@@ -18,9 +18,12 @@ const query = gql`
     hello: String!
     boards: [Board!]
     userBoards(userId: ID!): [Board!]
+    board(userId: ID!, boardId: ID!): Board!
   }
   type Subscription {
     boardAdded(userId: ID!): Board
+    threadAdded(boardId: ID!): Thread
+    postAdded(threadIds: [ID!]): Post
   }
   type Mutation {
     createBoard(name: String!, userId: ID!): Board

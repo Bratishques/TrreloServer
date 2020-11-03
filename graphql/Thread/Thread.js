@@ -1,5 +1,9 @@
+const { PubSub, withFilter } = require("apollo-server");
 const Board = require("../../models/Board");
 const Thread = require("../../models/Thread");
+const THREAD_ADDED = "THREAD_ADDED"
+
+const pubsub = new PubSub()
 
 
 const threadDef = `
@@ -12,6 +16,17 @@ type Thread {
 `;
 
 const threadResolvers = {
+  Subscription: {
+    threadAdded: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator([THREAD_ADDED]),
+        (payload, variables) => {
+          return payload.threadAdded.boardId === variables.boardId
+        }
+      )
+    }
+  },
+    
     Mutation: {
     createThread: async (_, { name: name, boardId: boardId }) => {
         try {
@@ -21,7 +36,11 @@ const threadResolvers = {
         await thread.save();
         const board = await Board.findById(boardId);
         board.threads.push(thread);
+
         await board.save();
+        pubsub.publish(THREAD_ADDED, {
+          threadAdded: {...thread.toJSON(), _id: thread.id, boardId: boardId}
+        })
         return { ...thread.toJSON(), _id: thread.id };
     }
     catch (e) {

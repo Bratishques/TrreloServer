@@ -1,4 +1,5 @@
 const { PubSub, withFilter } = require("apollo-server");
+const c = require("config");
 const Board = require("../../models/Board");
 const User = require("../../models/User");
 const BOARD_ADDED = "BOARD_ADDED";
@@ -34,8 +35,23 @@ const boardResolvers = {
         console.log(e);
       }
     },
-    hello: () => {
-      return "Hello world!";
+    board: async (_, { boardId: boardId, userId: userId }) => {
+      try {
+        const user = await User.findById(userId).populate({
+          path: "boards",
+          populate: {
+            path: "threads",
+            populate: {
+              path: "posts",
+            },
+          },
+        });
+        const result = user.boards.find((x) => x.id === boardId);
+        return { ...result.toJSON(), _id: result._id };
+      } catch (e) {
+        console.log(e);
+        return { e };
+      }
     },
   },
   Mutation: {
@@ -51,7 +67,7 @@ const boardResolvers = {
         user.boards.push(board);
         await user.save();
         pubsub.publish(BOARD_ADDED, {
-          boardAdded: { ...board.toJSON(), userId: user.id, _id: board.id},
+          boardAdded: { ...board.toJSON(), userId: user.id, _id: board.id },
         });
         return { ...board.toJSON(), _id: board.id };
       } catch (e) {
