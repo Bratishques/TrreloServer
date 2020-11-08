@@ -62,10 +62,10 @@ SubscriptionServer.create({
   execute,
   subscribe,
   onConnect: () => {
-    console.log("someoneconnect")
+    console.log("someone connected")
   },
   onDisconnect: () => {
-    console.log("someonedisconnect")
+    console.log("someone disconnected")
   }
 },
 {

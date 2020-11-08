@@ -1,5 +1,6 @@
 const { PubSub, withFilter } = require("apollo-server");
 const c = require("config");
+const { indexOf } = require("lodash");
 const Board = require("../../models/Board");
 const User = require("../../models/User");
 const BOARD_ADDED = "BOARD_ADDED";
@@ -45,7 +46,10 @@ const boardResolvers = {
               path: "posts",
             },
           },
-        });
+        })
+
+       
+        await user.save()
         const result = user.boards.find((x) => x.id === boardId);
         return { ...result.toJSON(), _id: result._id };
       } catch (e) {
@@ -55,6 +59,34 @@ const boardResolvers = {
     },
   },
   Mutation: {
+
+    async addUserToBoard(_, {userEmail, boardId}) {
+      try {
+        const user = await User.findOne({email: userEmail})
+        if (!user) {
+          throw new Error("User not found")
+        }
+        console.log(boardId)
+        const candidate = user.boards.find(a => a == boardId)
+
+       
+        if (candidate) {
+          throw new Error("User has such board")
+        }
+        const board = await Board.findById(boardId)
+        
+       
+        user.boards.push(board)
+        await user.save()
+        pubsub.publish(BOARD_ADDED, {
+          ...board.toJSON(), userId: user.id, _id: board.id
+        })
+        return {...board.toJSON(), _id:board.id}
+      } 
+      catch (e) {
+        return e
+      }
+    },
     async createBoard(_, { name, userId }) {
       try {
         const user = await User.findById(userId);
@@ -65,6 +97,7 @@ const boardResolvers = {
         });
         await board.save();
         user.boards.push(board);
+
         await user.save();
         pubsub.publish(BOARD_ADDED, {
           boardAdded: { ...board.toJSON(), userId: user.id, _id: board.id },

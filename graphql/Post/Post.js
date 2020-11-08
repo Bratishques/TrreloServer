@@ -2,6 +2,7 @@ const { withFilter, PubSub } = require("apollo-server");
 const Post = require("../../models/Post");
 const Thread = require("../../models/Thread");
 const POST_ADDED = "POST_ADDED"
+const POST_UPDATED = "POST_UPDATED"
 
 const pubsub = new PubSub()
 
@@ -12,9 +13,11 @@ const postDef = `
         status: String!
         comments: [Comment!]
         attachments: [Attachment!]
+        description: String
         createdAt: String!
         updatedAt: String!
         threadId: ID
+        updateType: String
     }
 `;
 const postResolvers = {
@@ -32,8 +35,25 @@ const postResolvers = {
                     return result
                 }
             )
-        }
+        },
+        postUpdated: {
+            subscribe: withFilter(
+            () => pubsub.asyncIterator([POST_UPDATED]),
+            (payload, variables) => {
+                if (payload.postUpdated.postId !== variables.postId) {
+                    return false
+                }
+                else return true
+            }
+        )}
 
+    },
+
+    Query: {
+        post: async (_, {postId: postId}) => {
+            const post = await Post.findById(postId)
+            return {...post.toJSON(), _id: post.id}
+        }
     },
     Mutation: {
         createPost: async (_, {name: name, threadId: threadId}) => {
@@ -53,6 +73,16 @@ const postResolvers = {
             await thread.save()
             return {...post.toJSON(), _id: post.id, threadId: thread.id}
 
+        },
+
+        updatePostDescription: async (_, {postId: postId, description: description}) => {
+            const post = await Post.findById(postId)
+            post.description = description
+            await post.save()
+            pubsub.publish(POST_UPDATED, {
+                postUpdated: {...post.toJSON(), postId: postId, _id: postId, updateType: "descriptionUpdated" }
+            })
+            return {...post.toJSON(), _id: post.id}
         }
     }
 }

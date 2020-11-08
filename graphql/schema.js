@@ -19,11 +19,13 @@ const query = gql`
     boards: [Board!]
     userBoards(userId: ID!): [Board!]
     board(userId: ID!, boardId: ID!): Board!
+    post(postId: ID!): Post!
   }
   type Subscription {
     boardAdded(userId: ID!): Board
     threadAdded(boardId: ID!): Thread
     postAdded(threadIds: [ID!]): Post
+    postUpdated(postId: ID!): Post
   }
   type Mutation {
     createBoard(name: String!, userId: ID!): Board
@@ -37,6 +39,8 @@ const query = gql`
     addAttachment(name: String!): Attachment
     createComment(authorId: ID!, text: String!, postId: ID!): Comment
     replyToComment(authorId: ID!, text: String!, commentId: ID!): Comment
+    addUserToBoard(userEmail: String!, boardId: ID!): User
+    updatePostDescription(postId: ID!, description: String!): Post
   }
 `;
 

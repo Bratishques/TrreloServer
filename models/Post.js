@@ -4,6 +4,7 @@ const schema = new Schema({
     name: String,
     comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
     status: String,
+    description: String,
     attachments: [{type: Schema.Types.ObjectId, ref: "Attachment"}],
 }, { timestamps: true })
 
