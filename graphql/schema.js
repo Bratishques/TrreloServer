@@ -20,11 +20,12 @@ const query = gql`
     userBoards(userId: ID!): [Board!]
     board(userId: ID!, boardId: ID!): Board!
     post(postId: ID!): Post!
+    thread(threadId: ID!) : Thread!
   }
   type Subscription {
     boardAdded(userId: ID!): Board
     threadAdded(boardId: ID!): Thread
-    postAdded(threadIds: [ID!]): Post
+    postAdded(threadId: ID!): Post
     postUpdated(postId: ID!): Post
   }
   type Mutation {
@@ -41,6 +42,7 @@ const query = gql`
     replyToComment(authorId: ID!, text: String!, commentId: ID!): Comment
     addUserToBoard(userEmail: String!, boardId: ID!): User
     updatePostDescription(postId: ID!, description: String!): Post
+    updatePostName(postId: ID!, name: String!):Post
   }
 `;
 

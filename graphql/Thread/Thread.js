@@ -16,6 +16,18 @@ type Thread {
 `;
 
 const threadResolvers = {
+
+  Query: {
+    thread: async(_, {threadId: threadId}) => {
+      try{
+        const thread = await Thread.findById(threadId).populate("posts")
+        return {...thread.toJSON(), _id: threadId }
+      }
+      catch (e){
+        return e
+      }
+    }
+  },
   Subscription: {
     threadAdded: {
       subscribe: withFilter(
