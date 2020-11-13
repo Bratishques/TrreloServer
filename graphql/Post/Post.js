@@ -46,7 +46,7 @@ const postResolvers = {
         subscribe: withFilter(
             () => pubsub.asyncIterator([POST_DELETED]),
             (payload, variables) => {
-                return payload.postUpdated.threadId === variables.threadId
+                return payload.postDeleted.threadId === variables.threadId
             }
         )
     }
@@ -59,9 +59,12 @@ const postResolvers = {
     },
   },
   Mutation: {
-    deletePost: async(_, {name: name, postId: postId}) => {
+    deletePost: async(_, {postId: postId, threadId: threadId}) => {
         try {
             await Post.deleteOne({_id: postId})
+            pubsub.publish(POST_DELETED, {
+              postDeleted: {_id:postId, postId: postId, threadId: threadId}
+            })
             return {_id: postId}
         }
         catch(e) {
