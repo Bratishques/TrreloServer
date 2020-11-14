@@ -27,8 +27,8 @@ const postResolvers = {
       subscribe: withFilter(
         () => pubsub.asyncIterator([POST_ADDED]),
         (payload, variables) => {
-        console.log(variables.threadId)
-          return  payload.postAdded.threadId ===  variables.threadId      
+          console.log(variables.threadId);
+          return payload.postAdded.threadId === variables.threadId;
         }
       ),
     },
@@ -43,13 +43,13 @@ const postResolvers = {
       ),
     },
     postDeleted: {
-        subscribe: withFilter(
-            () => pubsub.asyncIterator([POST_DELETED]),
-            (payload, variables) => {
-                return payload.postDeleted.threadId === variables.threadId
-            }
-        )
-    }
+      subscribe: withFilter(
+        () => pubsub.asyncIterator([POST_DELETED]),
+        (payload, variables) => {
+          return payload.postDeleted.threadId === variables.threadId;
+        }
+      ),
+    },
   },
 
   Query: {
@@ -59,17 +59,16 @@ const postResolvers = {
     },
   },
   Mutation: {
-    deletePost: async(_, {postId: postId, threadId: threadId}) => {
-        try {
-            await Post.deleteOne({_id: postId})
-            pubsub.publish(POST_DELETED, {
-              postDeleted: {_id:postId, postId: postId, threadId: threadId}
-            })
-            return {_id: postId}
-        }
-        catch(e) {
-            return e
-        }
+    deletePost: async (_, { postId: postId, threadId: threadId }) => {
+      try {
+        await Post.deleteOne({ _id: postId });
+        pubsub.publish(POST_DELETED, {
+          postDeleted: { _id: postId, postId: postId, threadId: threadId },
+        });
+        return { _id: postId };
+      } catch (e) {
+        return e;
+      }
     },
     createPost: async (_, { name: name, threadId: threadId }) => {
       const post = new Post({

@@ -28,6 +28,7 @@ const query = gql`
     postAdded(threadId: ID!): Post
     postUpdated(postId: ID!): Post
     postDeleted(threadId: ID!): Post
+    threadDeleted(boardId: ID!): Thread
   }
   type Mutation {
     createBoard(name: String!, userId: ID!): Board
@@ -45,6 +46,7 @@ const query = gql`
     updatePostDescription(postId: ID!, description: String!): Post
     updatePostName(postId: ID!, name: String!):Post
     deletePost(postId: ID!, threadId: ID!): Post
+    deleteThread(threadId: ID!, boardId: ID!): Post
   }
 `;
 

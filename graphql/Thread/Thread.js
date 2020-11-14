@@ -2,6 +2,7 @@ const { PubSub, withFilter } = require("apollo-server");
 const Board = require("../../models/Board");
 const Thread = require("../../models/Thread");
 const THREAD_ADDED = "THREAD_ADDED"
+const THREAD_DELETED = "THREAD_DELETED"
 
 const pubsub = new PubSub()
 
@@ -29,6 +30,14 @@ const threadResolvers = {
     }
   },
   Subscription: {
+    threadDeleted: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator([THREAD_DELETED]),
+        (payload,variables) => {
+          return payload.threadDeleted.boardId === variables.boardId
+        }
+      )
+    },
     threadAdded: {
       subscribe: withFilter(
         () => pubsub.asyncIterator([THREAD_ADDED]),
@@ -59,6 +68,18 @@ const threadResolvers = {
         console.log(e)
     }
       },
+      deleteThread: async(_, {threadId: threadId, boardId: boardId}) => {
+          try {
+            await Thread.deleteOne({_id:threadId})
+            pubsub.publish(THREAD_DELETED, {
+              threadDeleted : {_id: threadId, boardId: boardId}
+            })
+            return {_id: threadId}
+          }
+          catch (e) {
+
+          }
+      }
     }
 }
 
